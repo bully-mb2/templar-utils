@@ -79,7 +79,7 @@ public class Settings {
         String[] split = value.split(":");
 
         try {
-            return new InetSocketAddress(split[0], Integer.parseInt(split[0]));
+            return new InetSocketAddress(split[0], Integer.parseInt(split[1]));
         } catch (NumberFormatException e) {
             throw new InvalidPropertyException(String.format("Couldn't make address for (%s=%s) expected (%s=host:port)", key, value, key), e);
         }
