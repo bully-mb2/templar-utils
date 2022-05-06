@@ -74,7 +74,7 @@ public class Settings {
         throw new InvalidPropertyException(String.format("Couldn't parse (%s=%s) to boolean", key, value));
     }
 
-    public SocketAddress getAddress(String key) throws MissingPropertyException, InvalidPropertyException {
+    public InetSocketAddress getAddress(String key) throws MissingPropertyException, InvalidPropertyException {
         String value = get(key);
         String[] split = value.split(":");
 
