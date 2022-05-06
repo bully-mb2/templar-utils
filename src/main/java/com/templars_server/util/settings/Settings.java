@@ -39,6 +39,10 @@ public class Settings {
         }
     }
 
+    public void set(String key, String value) {
+        properties.setProperty(key, value);
+    }
+
     public String get(String key) throws MissingPropertyException {
         String value = properties.getProperty(key);
         if (value == null) {
