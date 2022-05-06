@@ -1,13 +1,11 @@
 package com.templars_server.util.settings;
 
-import com.templars_server.util.rcon.RconClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.SocketAddress;
-import java.util.Properties;
 
 public class Settings {
 
@@ -25,6 +23,7 @@ public class Settings {
      * @throws IOException if the template file could not be located
      */
     public void load(String pathname) throws IOException {
+        properties = new Properties();
         LOG.info("Loading config");
         File file = new File(pathname);
         if (file.exists()) {
