@@ -56,12 +56,16 @@ public class MBMqttClient {
         callbackMap.put(cl, new MBEventCallback<>(listener));
     }
 
-    private void messageArrived(String topic, MqttMessage message) throws Exception {
-        String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
-        Object event = unmarshaller.unmarshal(new StringReader(payload));
+    void messageArrived(String topic, MqttMessage message) throws Exception {
+        try {
+            String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+            Object event = unmarshaller.unmarshal(new StringReader(payload));
 
-        LOG.debug("Received " + event.getClass().getSimpleName());
-        raise(event);
+            LOG.debug("Received " + event.getClass().getSimpleName());
+            raise(event);
+        } catch (JAXBException e) {
+            LOG.error("Error unpacking message, are mb2-log-reader and the plugin up-to-date?", e);
+        }
     }
 
     private void raise(Object event) {
