@@ -60,7 +60,7 @@ public class MBMqttClient {
         String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
         Object event = unmarshaller.unmarshal(new StringReader(payload));
 
-        LOG.info("Received " + event.getClass().getSimpleName());
+        LOG.debug("Received " + event.getClass().getSimpleName());
         raise(event);
     }
 
