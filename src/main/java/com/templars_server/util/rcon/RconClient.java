@@ -14,10 +14,20 @@ public class RconClient {
     private static final String COMMAND_PREFIX = new String(new char[]{255, 255, 255, 255});
     private static final Charset CHARSET = Charset.forName("cp1252");
     private static final int RECEIVE_BUFFER_SIZE = 1024;
+    private static final int DEFAULT_TIMEOUT_MILLISECONDS = 200;
 
     private InetSocketAddress address;
     private String password;
     private DatagramSocket socket;
+
+    public void connect(InetSocketAddress address, String password) throws SocketException {
+        connect(
+                address,
+                new InetSocketAddress(0),
+                password,
+                DEFAULT_TIMEOUT_MILLISECONDS
+        );
+    }
 
     public void connect(InetSocketAddress address, InetSocketAddress bindAddress, String password, int timeoutMilliseconds) throws SocketException {
         this.address = address;
