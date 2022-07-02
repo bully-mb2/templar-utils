@@ -5,13 +5,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.net.InetSocketAddress;
-import java.net.SocketAddress;
 
 public class Settings {
 
     private static final Logger LOG = LoggerFactory.getLogger(Settings.class);
 
     private Properties properties;
+
+    public Settings() {
+        this.properties = new Properties();
+    }
 
     /**
      *
