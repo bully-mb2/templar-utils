@@ -97,7 +97,7 @@ public class RconClient {
     }
 
     public String map(String map) {
-        return send("map \"%s\"");
+        return send(String.format("map \"%s\"", map));
     }
 
     public String mode(int mode) {
@@ -105,7 +105,7 @@ public class RconClient {
     }
 
     public String mode(int mode, String map) {
-        return send("mbmode %d \"%s\"");
+        return send(String.format("mbmode %d \"%s\"", mode, map));
     }
 
     public String printAll(String message) {
