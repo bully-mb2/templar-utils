@@ -7,12 +7,17 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.net.*;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class RconClient {
 
     private static final Logger LOG = LoggerFactory.getLogger(RconClient.class);
     private static final String COMMAND_PREFIX = new String(new char[]{255, 255, 255, 255});
     private static final Charset CHARSET = Charset.forName("cp1252");
+    private static final Pattern STATUS_PATTERN = Pattern.compile("^ ([0-9]{1,2}) {5}");
     private static final int RECEIVE_BUFFER_SIZE = 1024;
     private static final int DEFAULT_TIMEOUT_MILLISECONDS = 200;
 
@@ -80,8 +85,34 @@ public class RconClient {
         return send(String.format("ban %d", slot));
     }
 
+    public String status(boolean truncateNames) {
+        if (truncateNames) {
+            return send("status");
+        }
+
+        return send("status notrunc");
+    }
+
     public String status() {
-        return send("status");
+        return status(false);
+    }
+
+    public List<Integer> playerSlots() {
+        List<Integer> slots = new ArrayList<>();
+        String[] status;
+        status = status(true).split("\n");
+        if (status.length < 2) {
+            return slots;
+        }
+
+        for (String line : status) {
+            Matcher matcher = STATUS_PATTERN.matcher(line);
+            if (matcher.find()) {
+                slots.add(Integer.parseInt(matcher.group(1)));
+            }
+        }
+
+        return slots;
     }
 
     public String say(String message) {
