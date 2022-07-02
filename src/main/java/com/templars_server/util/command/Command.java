@@ -46,7 +46,7 @@ public abstract class Command<T> {
         return false;
     }
 
-    abstract void onExecute(int slot, T context) throws InvalidArgumentException;
+    protected abstract void onExecute(int slot, T context) throws InvalidArgumentException;
 
     protected List<String> getArgs() {
         return args;
