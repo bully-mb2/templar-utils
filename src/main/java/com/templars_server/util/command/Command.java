@@ -34,14 +34,10 @@ public abstract class Command<T> {
         if (matcher.find()) {
             args.clear();
             args.addAll(List.of(matcher.group(1).split(" ")));
-            try {
-                LOG.debug(message);
-                LOG.debug(String.format("Executing %s with args %s player %d", getClass().getSimpleName(), args, slot));
-                onExecute(slot, context);
-                return true;
-            } catch (Exception e) {
-                LOG.error("Uncaught exception during command execution", e);
-            }
+            LOG.debug(message);
+            LOG.debug(String.format("Executing %s with args %s player %d", getClass().getSimpleName(), args, slot));
+            onExecute(slot, context);
+            return true;
         }
         return false;
     }
