@@ -10,19 +10,24 @@ import java.util.regex.Pattern;
 public abstract class Command<T> {
 
     private static final Logger LOG = LoggerFactory.getLogger(Command.class);
+    private static final String DEFAULT_SEPARATOR = " ";
 
     private final Pattern pattern;
     private final boolean requireExclamation;
-    private final String prefix;
     private final String usage;
     private final List<String> args;
+    private final String separator;
 
-    public Command(String regex, boolean requireExclamation, String prefix, String usage) {
+    public Command(String regex, boolean requireExclamation, String usage) {
+        this(regex, requireExclamation, usage, DEFAULT_SEPARATOR);
+    }
+
+    public Command(String regex, boolean requireExclamation, String usage, String separator) {
         this.pattern = Pattern.compile("^!?" + regex + " (.*)?$");
         this.requireExclamation = requireExclamation;
-        this.prefix = prefix;
-        this.usage = String.format("%sUsage: %s", prefix, usage);
+        this.usage = String.format("Usage: %s", usage);
         this.args = new ArrayList<>();
+        this.separator = separator;
     }
 
     public boolean execute(int slot, String message, T context) throws InvalidArgumentException {
@@ -33,7 +38,11 @@ public abstract class Command<T> {
         Matcher matcher = pattern.matcher(message + " ");
         if (matcher.find()) {
             args.clear();
-            args.addAll(List.of(matcher.group(1).split(" ")));
+            String argString = matcher.group(1);
+            if (argString != null && !argString.isEmpty()) {
+                args.addAll(List.of(matcher.group(1).split(separator)));
+            }
+
             LOG.debug(message);
             LOG.debug(String.format("Executing %s with args %s player %d", getClass().getSimpleName(), args, slot));
             onExecute(slot, context);
@@ -87,10 +96,6 @@ public abstract class Command<T> {
 
     public boolean isExclamationRequired() {
         return requireExclamation;
-    }
-
-    public String getPrefix() {
-        return prefix;
     }
 
     public String getUsage() {
