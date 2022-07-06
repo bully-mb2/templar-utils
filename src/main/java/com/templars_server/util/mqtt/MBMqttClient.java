@@ -57,14 +57,17 @@ public class MBMqttClient {
     }
 
     void messageArrived(String topic, MqttMessage message) throws Exception {
+        String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
+
         try {
-            String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
             Object event = unmarshaller.unmarshal(new StringReader(payload));
 
             LOG.debug("Received " + event.getClass().getSimpleName());
             raise(event);
         } catch (JAXBException e) {
             LOG.error("Error unpacking message, are mb2-log-reader and the plugin up-to-date?", e);
+        } catch (Exception e) {
+            LOG.error("Uncaught exception processing message: " + payload, e);
         }
     }
 
