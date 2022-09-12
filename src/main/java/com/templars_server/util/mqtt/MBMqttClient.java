@@ -28,7 +28,7 @@ public class MBMqttClient {
     public void connect(String uri, String topic) throws MqttException {
         LOG.info("Initializing unmarshaller");
         try {
-            JAXBContext context = JAXBContext.newInstance("generated");
+            JAXBContext context = JAXBContext.newInstance("com.templars_server.mb2_log_reader.schema");
             unmarshaller = context.createUnmarshaller();
         } catch (JAXBException e) {
             throw new RuntimeException("Failed to initialize unmarshaller", e);
@@ -56,7 +56,7 @@ public class MBMqttClient {
         callbackMap.put(cl, new MBEventCallback<>(listener));
     }
 
-    void messageArrived(String topic, MqttMessage message) throws Exception {
+    void messageArrived(String topic, MqttMessage message) {
         String payload = new String(message.getPayload(), StandardCharsets.UTF_8);
 
         try {
