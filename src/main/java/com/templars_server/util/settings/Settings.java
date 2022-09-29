@@ -33,15 +33,13 @@ public class Settings {
         if (file.exists()) {
             try (FileInputStream stream = new FileInputStream(file)) {
                 properties.load(stream);
-                LOG.info("Loading any missing properties");
-                loadDefaults(pathname, false);
+                appendMissing(pathname);
             }
         } else {
             LOG.info("No config found, creating from default");
-            loadDefaults(pathname, true);
+            loadDefaults(pathname);
+            store(pathname);
         }
-
-        store(pathname);
     }
 
     /**
@@ -52,7 +50,7 @@ public class Settings {
      * @throws IOException if it can't create the file
      */
     public void store(String pathname) throws IOException {
-        LOG.info("Storing config");
+        LOG.info("Storing properties");
         try (FileOutputStream stream = new FileOutputStream(pathname)) {
             properties.store(stream, null);
         }
@@ -63,22 +61,44 @@ public class Settings {
      * Loads the default properties file template from classpath resources
      *
      * @param pathname path to settings file
-     * @param overwrite if the defaults should overwrite existing keys or not
      * @throws IOException if the template file could not be read
      */
-    public void loadDefaults(String pathname, boolean overwrite) throws IOException {
+    public void loadDefaults(String pathname) throws IOException {
         LOG.info("Loading default config");
         Properties defaults = new Properties();
         try (InputStream stream = Settings.class.getResourceAsStream("/" + pathname)) {
             defaults.load(stream);
+            properties.putAll(defaults);
+        }
+    }
+
+    /**
+     *
+     * Appends any missing properties to the properties and the file on disk
+     *
+     * @throws IOException if it can't locate the file
+     */
+    private void appendMissing(String pathname) throws IOException {
+        LOG.info("Appending missing properties");
+        int appended = 0;
+        Properties defaults = new Properties();
+        try (
+             InputStream stream = Settings.class.getResourceAsStream("/" + pathname);
+             FileWriter fw = new FileWriter(pathname, true);
+             BufferedWriter bw = new BufferedWriter(fw);
+             PrintWriter out = new PrintWriter(bw)
+        ) {
+            defaults.load(stream);
             for (Map.Entry<Object, Object> entry : defaults.entrySet()) {
-                if (overwrite) {
-                    properties.put(entry.getKey(), entry.getValue());
-                } else {
-                    properties.putIfAbsent(entry.getKey(), entry.getValue());
+                Object key = properties.putIfAbsent(entry.getKey(), entry.getValue());
+                if (key == null) {
+                    out.println(String.format("%s=%s", entry.getKey(), entry.getValue()));
+                    appended++;
                 }
             }
         }
+
+        LOG.info("Stored " + appended + " new properties");
     }
 
     public void set(String key, String value) {
